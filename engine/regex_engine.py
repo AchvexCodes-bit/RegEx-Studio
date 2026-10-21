@@ -185,7 +185,25 @@ class NFA:
             trace.append({"index":i+1,"char":ch,"active":sorted(states),"epsilon":False})
         return {"matched":self.accept in states,"trace":trace,"state_count":self.next_id}
 
-def parse(pattern): return Parser(pattern).parse()
+def parse(pattern):
+    if len(pattern) > MAX_PATTERN:
+        raise RegexSyntaxError("Pattern is too long (limit 512)", MAX_PATTERN)
+    # In full-string recognition, outer ^ and $ are redundant. Accepting
+    # them keeps common anchored patterns intuitive without pretending to
+    # implement multiline or context-dependent anchor semantics.
+    offset = 1 if pattern.startswith("^") else 0
+    body = pattern[offset:]
+    if body.endswith("$"):
+        body = body[:-1]
+    node = Parser(body).parse()
+    if offset:
+        def shift(n):
+            n.start += offset
+            n.end += offset
+            for child in n.children:
+                shift(child)
+        shift(node)
+    return node
 
 def to_dfa(nfa):
     start=nfa.closure({nfa.start}); subsets=[start]; index={start:0}; trans={}
