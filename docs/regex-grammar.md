@@ -6,7 +6,7 @@ Supported:
 - Literal ASCII characters and escaped punctuation.
 - Groups (expression), alternation a|b, concatenation.
 - Character classes [abc], ranges [a-z], and negated classes [^0-9].
-- Wildcard ., excluding LF and CR.
+- Wildcard ., excluding LF and CR. Outer ^ and $ anchors are accepted as redundant in full-string mode only; they do not implement multiline semantics.
 - ASCII \d, \w, \s and their uppercase complements.
 - Escaped newline, carriage return, tab, form feed, vertical tab.
 - Greedy-agnostic language quantifiers *, +, ?, {m}, {m,}, {m,n}. Repetition bounds are capped at 32.
