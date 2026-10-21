@@ -36,7 +36,7 @@ class ApiTests(SimpleTestCase):
 
     def test_compile_returns_ast_and_automata(self):
         response = self.post_json("/api/v1/automata/compile/", {"pattern": r"(ab|c)+\d{2}"})
-        self.assertEqual(response.status_code, 200, b"".join(response.streaming_content))
+        self.assertEqual(response.status_code, 200, response.content)
         data = response.json()
         self.assertIn("ast", data)
         self.assertIn("nfa", data)
@@ -50,7 +50,7 @@ class ApiTests(SimpleTestCase):
 
     def test_simulation_trace(self):
         response = self.post_json("/api/v1/automata/simulate/", {"pattern": r"(ab|c)+\d{2}", "input": "abc12"})
-        self.assertEqual(response.status_code, 200, b"".join(response.streaming_content))
+        self.assertEqual(response.status_code, 200, response.content)
         data = response.json()
         self.assertTrue(data["matched"])
         self.assertEqual(len(data["trace"]), 6)
@@ -126,7 +126,7 @@ class UserWorkspaceTests(TestCase):
             "email": "new@example.com",
             "password": "CorrectHorse9!",
         })
-        self.assertEqual(response.status_code, 201, b"".join(response.streaming_content))
+        self.assertEqual(response.status_code, 201, response.content)
         user = self.User.objects.get(username="new-regex-user")
         self.assertTrue(user.check_password("CorrectHorse9!"))
         self.assertNotEqual(user.password, "CorrectHorse9!")
@@ -189,7 +189,7 @@ class UserWorkspaceTests(TestCase):
             content_type="application/json",
             HTTP_X_CSRFTOKEN=token,
         )
-        self.assertEqual(response.status_code, 201, b"".join(response.streaming_content))
+        self.assertEqual(response.status_code, 201, response.content)
 
     def test_saved_pattern_crud_and_favorite_filter(self):
         self.client.force_login(self.user)
@@ -256,7 +256,7 @@ class UserWorkspaceTests(TestCase):
         for payload, message in cases:
             with self.subTest(message=message):
                 response = self.post_json("/api/v1/patterns/", payload)
-                self.assertEqual(response.status_code, 400, b"".join(response.streaming_content))
+                self.assertEqual(response.status_code, 400, response.content)
                 self.assertIn(message.lower(), response.json()["error"].lower())
 
     def test_pattern_body_size_limit(self):
