@@ -1,0 +1,36 @@
+import unittest
+from engine.regex_engine import parse, NFA, to_dfa, minimize_dfa, compile_pattern, RegexSyntaxError
+
+class EngineTests(unittest.TestCase):
+    def matches(self, pattern, text):
+        nfa=NFA().compile(parse(pattern))
+        return nfa.simulate(text)["matched"]
+    def test_literals_and_full_match(self):
+        self.assertTrue(self.matches("abc","abc"))
+        self.assertFalse(self.matches("abc","zabc"))
+    def test_alternation_and_repetition(self):
+        for text in ("ab","c","abcab"): self.assertTrue(self.matches("(ab|c)+",text))
+        self.assertFalse(self.matches("(ab|c)+","a"))
+    def test_classes_and_bounds(self):
+        self.assertTrue(self.matches("[a-c]{2,3}","abc"))
+        self.assertFalse(self.matches("[a-c]{2,3}","abcd"))
+        self.assertTrue(self.matches(r"\d+","123"))
+    def test_empty_and_optional(self):
+        self.assertTrue(self.matches("a*",""))
+        self.assertTrue(self.matches("colou?r","color"))
+    def test_bad_patterns(self):
+        for p in ("(","[abc","a{4,2}","*a", "\\"):
+            with self.assertRaises(RegexSyntaxError): parse(p)
+    def test_dfa_minimization_preserves_examples(self):
+        c=compile_pattern("(ab|c)+")
+        d,m=c["dfa"],c["minimized"]
+        for word in ("","a","ab","c","abc","cc","ac"):
+            s=d["start"]
+            for ch in word: s=d["transitions"].get(s,{}).get(ch,-1)
+            one=s in d["accepts"]
+            s=m["start"]
+            for ch in word: s=m["transitions"].get(s,{}).get(ch,-1)
+            two=s in m["accepts"]
+            self.assertEqual(one,two,word)
+
+if __name__=="__main__": unittest.main()
