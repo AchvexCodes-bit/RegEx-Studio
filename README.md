@@ -40,7 +40,8 @@ Supports literals, escaped punctuation, groups, alternation, concatenation, `.`,
 ## Tests
 
 ```bash
-python -m unittest discover -s tests -v
+python -m unittest discover -s tests -p 'test_engine.py' -v
+python manage.py test tests.test_api -v 2
 ```
 
 ## Security and limitations
