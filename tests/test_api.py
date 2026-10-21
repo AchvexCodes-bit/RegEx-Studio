@@ -222,6 +222,7 @@ class UserWorkspaceTests(TestCase):
         filtered = self.client.get("/api/v1/patterns/?favorites=1").json()["patterns"]
         self.assertEqual([value["id"] for value in filtered], [item["id"]])
         self.assertEqual(len(self.client.get("/api/v1/patterns/?q=missing").json()["patterns"]), 0)
+        self.assertEqual(self.client.get("/api/v1/patterns/?q=%5Cd%2B").json()["patterns"][0]["id"], item["id"])
 
         renamed = self.client.patch(
             f"/api/v1/patterns/{item['id']}/",
