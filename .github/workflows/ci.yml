@@ -16,7 +16,19 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
       - run: python -m pip install -r requirements.txt
-      - run: python -m unittest discover -s tests -p 'test_engine.py' -v
-      - run: python manage.py check
-      - run: python manage.py test tests.test_api -v 2
+      - name: Check browser JavaScript and DOM references
+        run: python scripts/check_frontend.py
+      - name: Check Python syntax
+        run: python -m compileall -q config engine playground tests
+      - name: Check migrations are up to date
+        run: python manage.py makemigrations --check --dry-run
+      - name: Check Django configuration
+        run: python manage.py check
+      - name: Test regex engine
+        run: python -m unittest discover -s tests -p 'test_engine.py' -v
+      - name: Test API, accounts, and frontend smoke checks
+        run: python manage.py test tests -v 2
