@@ -20,9 +20,10 @@ class ApiTests(SimpleTestCase):
     def test_home_serves_workspace_and_account_ui(self):
         response = self.client.get("/")
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b"RegEx Studio", b"".join(response.streaming_content))
-        self.assertIn(b'id="userWorkspace"', b"".join(response.streaming_content))
-        self.assertIn(b'id="accountDialog"', b"".join(response.streaming_content))
+        body = b"".join(response.streaming_content)
+        self.assertIn(b"RegEx Studio", body)
+        self.assertIn(b'id="userWorkspace"', body)
+        self.assertIn(b'id="accountDialog"', body)
 
     def test_home_sets_csrf_cookie(self):
         response = self.client.get("/")
