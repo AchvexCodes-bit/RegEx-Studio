@@ -4,7 +4,7 @@
 - Pure Python recursive-descent parser and AST with source spans.
 - Thompson NFA, epsilon closure, full-input simulation and trace.
 - NFA-to-DFA subset construction over ASCII and partition-refinement minimization.
-- Django health and compile endpoints with request-size cap and anonymous throttling.
+- Django health, compile, and simulation endpoints with request-size and algorithm limits.
 - Browser workspace with native JavaScript tester, SVG NFA, and trace controls.
 - Unit tests for representative parser/compiler/matching cases.
 
