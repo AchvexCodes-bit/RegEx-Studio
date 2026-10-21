@@ -8,7 +8,7 @@ A developer-focused regular-expression playground with a real parser, Thompson N
 
 ## Quick start
 
-The playground is static and can run without a server:
+The native JavaScript tester can run from a static server. The AST, NFA/DFA graph, and automaton debugger require the Django API:
 
 ```bash
 python -m http.server 8000
@@ -31,7 +31,7 @@ python manage.py runserver
 - Automaton mode: supported regex subset parsed into an AST, compiled to Thompson NFA, simulated over the full input, converted to DFA, and minimized.
 - SVG graph with state selection, fit/reset, NFA/DFA/minimized DFA views, and execution trace stepping.
 - Resource limits and explicit unsupported-syntax errors.
-- Django health and compile API foundation.
+- Django health, compile, and simulation APIs.
 
 ## Automaton grammar
 
