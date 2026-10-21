@@ -63,7 +63,7 @@ class EngineTests(unittest.TestCase):
 
 
     def test_escaped_dollar_remains_literal(self):
-        self.assertTrue(self.matches(r"\\$", "$"))
-        self.assertFalse(self.matches(r"\\$", "x"))
+        self.assertTrue(self.matches(r"\$", "$"))
+        self.assertFalse(self.matches(r"\$", "x"))
 
 if __name__=="__main__": unittest.main()
