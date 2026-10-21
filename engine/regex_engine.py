@@ -200,23 +200,50 @@ def to_dfa(nfa):
     return {"start":0,"transitions":trans,"accepts":accepts,"subsets":subsets}
 
 def minimize_dfa(dfa):
-    states=set(dfa["transitions"]); accepts=set(dfa["accepts"]); non=states-accepts
-    parts=[p for p in (accepts,non) if p]
-    alphabet=ALPHABET
-    changed=True
+    # Complete the partial DFA with an implicit rejecting sink before
+    # partition refinement. Otherwise a missing edge and an edge to a
+    # non-accepting dead state can be incorrectly treated as different.
+    states = set(dfa["transitions"])
+    accepts = set(dfa["accepts"])
+    sink = max(states, default=-1) + 1
+    all_states = states | {sink}
+    full = {}
+    for state in states:
+        full[state] = {ch: dfa["transitions"].get(state, {}).get(ch, sink) for ch in ALPHABET}
+    full[sink] = {ch: sink for ch in ALPHABET}
+    parts = [group for group in (accepts, all_states - accepts) if group]
+    changed = True
     while changed:
-        changed=False; new=[]
+        changed = False
+        refined = []
         for group in parts:
-            buckets={}
-            for s in group:
-                signature=tuple(next((i for i,p in enumerate(parts) if dfa["transitions"].get(s,{}).get(ch) in p),-1) for ch in alphabet)
-                buckets.setdefault(signature,set()).add(s)
-            new.extend(buckets.values()); changed |= len(buckets)>1
-        parts=new
-    mapping={s:i for i,g in enumerate(parts) for s in g}; trans={}
-    for i,g in enumerate(parts):
-        representative=next(iter(g)); trans[i]={ch:mapping[t] for ch,t in dfa["transitions"].get(representative,{}).items()}
-    return {"start":mapping[dfa["start"]],"transitions":trans,"accepts":{mapping[s] for s in accepts},"groups":[sorted(g) for g in parts]}
+            buckets = {}
+            for state in group:
+                signature = tuple(
+                    next(i for i, part in enumerate(parts) if full[state][ch] in part)
+                    for ch in ALPHABET
+                )
+                buckets.setdefault(signature, set()).add(state)
+            refined.extend(buckets.values())
+            changed = changed or len(buckets) > 1
+        parts = refined
+
+    # Do not emit a sink-only partition: missing transitions remain implicit.
+    kept = [group for group in parts if group & states]
+    mapping = {state: i for i, group in enumerate(kept) for state in group if state in states}
+    transitions = {}
+    for i, group in enumerate(kept):
+        representative = min(group & states)
+        transitions[i] = {}
+        for ch, target in full[representative].items():
+            if target in mapping:
+                transitions[i][ch] = mapping[target]
+    return {
+        "start": mapping[dfa["start"]],
+        "transitions": transitions,
+        "accepts": {mapping[state] for state in accepts},
+        "groups": [sorted(group & states) for group in kept],
+    }
 
 def compile_pattern(pattern):
     ast=parse(pattern); nfa=NFA().compile(ast); dfa=to_dfa(nfa); minimized=minimize_dfa(dfa)
