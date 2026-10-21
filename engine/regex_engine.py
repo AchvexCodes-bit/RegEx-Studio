@@ -194,7 +194,13 @@ def parse(pattern):
     offset = 1 if pattern.startswith("^") else 0
     body = pattern[offset:]
     if body.endswith("$"):
-        body = body[:-1]
+        backslashes = 0
+        cursor = len(body) - 2
+        while cursor >= 0 and body[cursor] == "\\":
+            backslashes += 1
+            cursor -= 1
+        if backslashes % 2 == 0:
+            body = body[:-1]
     node = Parser(body).parse()
     if offset:
         def shift(n):
