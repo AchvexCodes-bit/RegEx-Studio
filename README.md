@@ -35,7 +35,7 @@ python manage.py runserver
 
 ## Automaton grammar
 
-Supports literals, escaped punctuation, groups, alternation, concatenation, `.`, character classes/ranges/negation, `\\d \\D \\w \\W \\s \\S`, `\\n \\r \\t`, and `* + ? {m} {m,} {m,n}`. Automaton matching is **full-string recognition**. Anchors, lookarounds, backreferences, captures, and flavor-specific Unicode behavior are not implemented in this first engine milestone; unsupported constructs should be reported rather than silently approximated. Use Native Tester for browser-supported JavaScript syntax.
+Supports literals, escaped punctuation, groups, alternation, concatenation, `.`, character classes/ranges/negation, `\\d \\D \\w \\W \\s \\S`, `\\n \\r \\t`, and `* + ? {m} {m,} {m,n}`. Automaton matching is **full-string recognition**. Outer ^ and $ are accepted as redundant in full-match mode; multiline/context-dependent anchor semantics, lookarounds, backreferences, captures, and flavor-specific Unicode behavior are not implemented. Unsupported constructs are reported rather than silently approximated. Use Native Tester for browser-supported JavaScript syntax.
 
 ## Tests
 
