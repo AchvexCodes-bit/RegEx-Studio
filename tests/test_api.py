@@ -30,6 +30,17 @@ class ApiTests(SimpleTestCase):
         response = self.client.post("/api/v1/automata/compile/", data=json.dumps({"pattern": "("}), content_type="application/json")
         self.assertEqual(response.status_code, 400)
         self.assertIn("position", response.json())
-    def test_oversized_request_rejected(self):
+    def test_oversized_compile_request_returns_413(self):
         response = self.client.post("/api/v1/automata/compile/", data=" " * 17000, content_type="application/json")
         self.assertEqual(response.status_code, 413)
+        self.assertIn("16 KB", response.json()["error"])
+
+    def test_oversized_simulation_request_returns_413(self):
+        response = self.client.post("/api/v1/automata/simulate/", data=" " * 17000, content_type="application/json")
+        self.assertEqual(response.status_code, 413)
+        self.assertIn("16 KB", response.json()["error"])
+
+    def test_non_object_json_returns_400(self):
+        response = self.client.post("/api/v1/automata/compile/", data=json.dumps(["not", "an", "object"]), content_type="application/json")
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("JSON body must be an object", response.json()["error"])
