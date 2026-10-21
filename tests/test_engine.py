@@ -51,4 +51,9 @@ class EngineTests(unittest.TestCase):
                     self.assertEqual(accepts(dfa), expected, (pattern, sample, "DFA"))
                     self.assertEqual(accepts(minimized), expected, (pattern, sample, "minimized DFA"))
 
+
+    def test_non_ascii_pattern_is_rejected_explicitly(self):
+        with self.assertRaises(RegexSyntaxError):
+            parse("café")
+
 if __name__=="__main__": unittest.main()
