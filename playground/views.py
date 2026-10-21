@@ -6,9 +6,12 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST
 from engine.regex_engine import compile_pattern, ast_json, graph_json, RegexSyntaxError
 
+class PayloadTooLarge(ValueError):
+    """Raised when a JSON API request exceeds the documented body limit."""
+
 def read_payload(request):
     if len(request.body) > 16384:
-        raise ValueError("Request body exceeds 16 KB")
+        raise PayloadTooLarge("Request body exceeds 16 KB")
     data = json.loads(request.body or b"{}")
     if not isinstance(data, dict):
         raise ValueError("JSON body must be an object")
@@ -48,6 +51,8 @@ def compile_regex(request):
         })
     except RegexSyntaxError as exc:
         return JsonResponse({"error": exc.message, "position": exc.position}, status=400)
+    except PayloadTooLarge as exc:
+        return JsonResponse({"error": str(exc)}, status=413)
     except (ValueError, TypeError, json.JSONDecodeError) as exc:
         return JsonResponse({"error": str(exc) or "Invalid request"}, status=400)
 
