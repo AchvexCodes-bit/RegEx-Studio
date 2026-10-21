@@ -96,8 +96,8 @@ class EngineTests(unittest.TestCase):
 
     def test_dot_excludes_line_breaks_and_empty_branches_work(self):
         self.assertTrue(self.matches(".", "x"))
-        self.assertFalse(self.matches(".", "\\n"))
-        self.assertFalse(self.matches(".*", "a\\nb"))
+        self.assertFalse(self.matches(".", "\n"))
+        self.assertFalse(self.matches(".*", "a\nb"))
         self.assertTrue(self.matches("(a|)", ""))
         self.assertTrue(self.matches("(a|)", "a"))
         self.assertFalse(self.matches("(a|)", "b"))
