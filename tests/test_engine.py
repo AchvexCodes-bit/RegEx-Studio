@@ -58,7 +58,7 @@ class EngineTests(unittest.TestCase):
 
 
     def test_outer_anchors_in_full_match_mode(self):
-        self.assertTrue(self.matches(r"^(ab|c)+\\d{2}$", "abc12"))
-        self.assertFalse(self.matches(r"^(ab|c)+\\d{2}$", "abc1"))
+        self.assertTrue(self.matches(r"^(ab|c)+\d{2}$", "abc12"))
+        self.assertFalse(self.matches(r"^(ab|c)+\d{2}$", "abc1"))
 
 if __name__=="__main__": unittest.main()
