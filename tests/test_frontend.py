@@ -53,7 +53,7 @@ class FrontendSmokeTests(unittest.TestCase):
 
     def test_saved_user_content_is_rendered_as_text(self):
         self.assertIn("title.textContent=item.name", HTML)
-        self.assertIn("code.textContent=\\"/"+'item.pattern+"/"+item.flags', HTML)
+        self.assertIn('code.textContent="/"+item.pattern+"/"+item.flags', HTML)
         self.assertNotIn('card.innerHTML=', HTML)
 
     def test_inline_javascript_syntax_when_node_is_available(self):
