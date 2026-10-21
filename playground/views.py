@@ -1,5 +1,8 @@
 import json
-from django.http import JsonResponse
+from pathlib import Path
+from django.conf import settings
+from django.http import FileResponse, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST
 from engine.regex_engine import compile_pattern, ast_json, graph_json, RegexSyntaxError
 
@@ -21,9 +24,14 @@ def dfa_json(dfa):
     }
 
 @require_GET
+def home(request):
+    return FileResponse(open(settings.BASE_DIR / "index.html", "rb"), content_type="text/html; charset=utf-8")
+
+@require_GET
 def health(request):
     return JsonResponse({"status": "ok", "service": "regex-studio"})
 
+@csrf_exempt
 @require_POST
 def compile_regex(request):
     try:
@@ -43,6 +51,7 @@ def compile_regex(request):
     except (ValueError, TypeError, json.JSONDecodeError) as exc:
         return JsonResponse({"error": str(exc) or "Invalid request"}, status=400)
 
+@csrf_exempt
 @require_POST
 def simulate_regex(request):
     try:
