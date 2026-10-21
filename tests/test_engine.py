@@ -33,4 +33,22 @@ class EngineTests(unittest.TestCase):
             two=s in m["accepts"]
             self.assertEqual(one,two,word)
 
+
+    def test_nfa_dfa_minimized_equivalence_on_generated_strings(self):
+        from itertools import product
+        for pattern in ("a*", "(ab|c)+", "[a-c]{2,3}", "a?b"):
+            compiled = compile_pattern(pattern)
+            nfa, dfa, minimized = compiled["nfa"], compiled["dfa"], compiled["minimized"]
+            for length in range(5):
+                for chars in product("abc12", repeat=length):
+                    sample = "".join(chars)
+                    expected = nfa.simulate(sample)["matched"]
+                    def accepts(machine):
+                        state = machine["start"]
+                        for char in sample:
+                            state = machine["transitions"].get(state, {}).get(char, -1)
+                        return state in machine["accepts"]
+                    self.assertEqual(accepts(dfa), expected, (pattern, sample, "DFA"))
+                    self.assertEqual(accepts(minimized), expected, (pattern, sample, "minimized DFA"))
+
 if __name__=="__main__": unittest.main()
