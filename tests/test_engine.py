@@ -61,4 +61,9 @@ class EngineTests(unittest.TestCase):
         self.assertTrue(self.matches(r"^(ab|c)+\d{2}$", "abc12"))
         self.assertFalse(self.matches(r"^(ab|c)+\d{2}$", "abc1"))
 
+
+    def test_escaped_dollar_remains_literal(self):
+        self.assertTrue(self.matches(r"\\$", "$"))
+        self.assertFalse(self.matches(r"\\$", "x"))
+
 if __name__=="__main__": unittest.main()
