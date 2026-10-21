@@ -107,6 +107,7 @@ class Parser:
             literals={"n":"\n","r":"\r","t":"\t","f":"\f","v":"\v"}
             if e.isalpha() and e not in literals: raise RegexSyntaxError(f"Unsupported escape \\{e}",start)
             return Node("lit",literals.get(e,e),start=start,end=self.i)
+        if ord(c) > 127: raise RegexSyntaxError("Automaton mode supports ASCII patterns only", start)
         if c==".": return Node("set",frozenset(set(ALPHABET)-{"\n","\r"}),start=start,end=self.i)
         if c in "^$)": raise RegexSyntaxError(f"Unsupported or unexpected token {c!r}",start)
         if c in "*+?{}": raise RegexSyntaxError("Quantifier has no preceding atom",start)
@@ -119,6 +120,7 @@ class Parser:
             m={"n":"\n","r":"\r","t":"\t"}
             if e.lower() in ("d","w","s"): raise RegexSyntaxError("Shorthand classes inside ranges are not supported yet",self.i-2)
             return m.get(e,e)
+        if ord(c) > 127: raise RegexSyntaxError("Automaton mode supports ASCII patterns only", start)
         return c
 
 class NFA:
