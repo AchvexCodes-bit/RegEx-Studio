@@ -68,5 +68,7 @@ def simulate_regex(request):
         return JsonResponse(result)
     except RegexSyntaxError as exc:
         return JsonResponse({"error": exc.message, "position": exc.position}, status=400)
+    except PayloadTooLarge as exc:
+        return JsonResponse({"error": str(exc)}, status=413)
     except (ValueError, TypeError, json.JSONDecodeError) as exc:
         return JsonResponse({"error": str(exc) or "Invalid request"}, status=400)
