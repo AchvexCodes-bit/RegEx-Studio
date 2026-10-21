@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from django.db import IntegrityError, transaction
+from django.db.models import Q
 from django.conf import settings
 from django.http import FileResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
@@ -233,7 +234,7 @@ def saved_patterns(request):
         items = SavedPattern.objects.filter(owner=request.user)
         query = request.GET.get("q", "").strip()[:80]
         if query:
-            items = items.filter(name__icontains=query)
+            items = items.filter(Q(name__icontains=query) | Q(pattern__icontains=query))
         if request.GET.get("favorites") == "1":
             items = items.filter(is_favorite=True)
         return JsonResponse({"patterns": [_pattern_json(item) for item in items[:100]]})
