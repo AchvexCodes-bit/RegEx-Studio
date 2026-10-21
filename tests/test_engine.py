@@ -53,8 +53,9 @@ class EngineTests(unittest.TestCase):
 
 
     def test_non_ascii_pattern_is_rejected_explicitly(self):
-        with self.assertRaises(RegexSyntaxError):
-            parse("café")
+        for pattern in ("café", "[\\é]"):
+            with self.subTest(pattern=pattern), self.assertRaises(RegexSyntaxError):
+                parse(pattern)
 
 
     def test_outer_anchors_in_full_match_mode(self):
