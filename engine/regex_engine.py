@@ -119,7 +119,9 @@ class Parser:
             e=self.take()
             m={"n":"\n","r":"\r","t":"\t"}
             if e.lower() in ("d","w","s"): raise RegexSyntaxError("Shorthand classes inside ranges are not supported yet",self.i-2)
-            return m.get(e,e)
+            value=m.get(e,e)
+            if ord(value) > 127: raise RegexSyntaxError("Automaton mode supports ASCII patterns only", self.i-2)
+            return value
         if ord(c) > 127: raise RegexSyntaxError("Automaton mode supports ASCII patterns only", start)
         return c
 
